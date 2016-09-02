@@ -7,11 +7,11 @@ var rl = readline.createInterface({
 });
 
 rl.on('line', function(line){
-    console.log("C: " + line);
+    console.log("FF: " + line);
 })
 
 rl.on('close', function(line){
-    console.log("C_CLOSE");
+    console.log("FF_CLOSE");
 })
 
-console.log("C_AWS_REGION", process.env.AWS_REGION)
+console.log("FF_AWS_REGION", process.env.AWS_REGION)
