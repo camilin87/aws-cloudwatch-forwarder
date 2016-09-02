@@ -1,0 +1,19 @@
+{
+  "name": "aws-cloudwatch-forwarder",
+  "version": "0.0.1",
+  "description": "Forwards the Stdin to AWS Cloudwatch",
+  "scripts": {
+    "start": "node main.js",
+    "test": "jasmine"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/camilin87/aws-cloudwatch-forwarder.git"
+  },
+  "author": "@camilin87",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/camilin87/aws-cloudwatch-forwarder/issues"
+  },
+  "homepage": "https://github.com/camilin87/aws-cloudwatch-forwarder#readme"
+}
