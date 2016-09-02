@@ -1,6 +1,6 @@
 {
   "name": "aws-cloudwatch-forwarder",
-  "version": "0.0.1",
+  "version": "0.0.1-beta1",
   "description": "Forwards the Stdin to AWS Cloudwatch",
   "scripts": {
     "start": "node main.js",
