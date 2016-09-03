@@ -1,4 +1,5 @@
 var readline = require('readline');
+var Rx = require('rx');
 
 var rl = readline.createInterface({
   input: process.stdin,
@@ -6,11 +7,13 @@ var rl = readline.createInterface({
   terminal: false
 });
 
-rl.on('line', function(line){
+var rlOn = Rx.Observable.fromCallback(rl.on);
+
+rlOn("line").subscribe((line) => {
     console.log("FF: " + line);
 })
 
-rl.on('close', function(line){
+rlOn("close").subscribe(() => {
     console.log("FF_CLOSE");
 })
 
