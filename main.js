@@ -7,14 +7,12 @@ var rl = readline.createInterface({
   terminal: false
 });
 
-var rlOn = Rx.Observable.fromCallback(rl.on);
-
-rlOn("line").subscribe((line) => {
-    console.log("FF: " + line);
-})
-
-rlOn("close").subscribe(() => {
-    console.log("FF_CLOSE");
-})
+var lines = Rx.Observable.fromEvent(rl, 'line')
+    .takeUntil(Rx.Observable.fromEvent(rl, 'close'))
+    .subscribe(
+        (line) => console.log("FF: " + line),
+        err => console.log("FF_Error: %s", err),
+        () => console.log("FF_COMPLETED")
+    );
 
 console.log("FF_AWS_REGION", process.env.AWS_REGION)
