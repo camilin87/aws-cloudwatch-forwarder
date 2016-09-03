@@ -9,8 +9,13 @@ var rl = readline.createInterface({
 
 var lines = Rx.Observable.fromEvent(rl, 'line')
     .takeUntil(Rx.Observable.fromEvent(rl, 'close'))
+    .bufferCount(10)
+    .bufferTime(1000)
+    .skipWhile((b) => (b || []).length === 0);
+
+lines
     .subscribe(
-        (line) => console.log("FF: " + line),
+        (lines) => console.log("FF: " + lines.map(l => l.toString()).join(",").substr(0, 20)),
         err => console.log("FF_Error: %s", err),
         () => console.log("FF_COMPLETED")
     );
