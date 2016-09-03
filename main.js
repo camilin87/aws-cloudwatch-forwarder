@@ -13,11 +13,16 @@ var lines = Rx.Observable.fromEvent(rl, 'line')
     .bufferTime(1000)
     .skipWhile((b) => (b || []).length === 0);
 
-lines
-    .subscribe(
-        (lines) => console.log("FF: " + lines.map(l => l.toString()).join(",").substr(0, 20)),
-        err => console.log("FF_Error: %s", err),
-        () => console.log("FF_COMPLETED")
-    );
+lines.subscribe(
+    (lines) => console.log("FF: " + lines.map(l => l.toString()).join(",").substr(0, 20)),
+    err => console.log("FF_Error: %s", err),
+    () => console.log("FF_COMPLETED")
+);
+
+// lines.forEach(
+//     (lines) => console.log("FF: " + lines.map(l => l.toString()).join(",").substr(0, 20)),
+//     err => console.log("FF_Error: %s", err),
+//     () => console.log("FF_COMPLETED")
+// );
 
 console.log("FF_AWS_REGION", process.env.AWS_REGION)
