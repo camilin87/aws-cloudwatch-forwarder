@@ -18,7 +18,8 @@
   "homepage": "https://github.com/camilin87/aws-cloudwatch-forwarder#readme",
   "dependencies": {
     "async": "^2.0.1",
-    "aws-sdk": "^2.5.5"
+    "aws-sdk": "^2.5.5",
+    "rfr": "^1.2.3"
   },
   "devDependencies": {
     "jasmine": "^2.4.1"
