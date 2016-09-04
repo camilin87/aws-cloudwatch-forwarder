@@ -30,4 +30,10 @@ describe("inputRepository", () => {
             terminal: false
         });
     })
+
+    it ("isInputClosed it false by default", () => {
+        var repository = inputRepository(readlineMock, processMock);
+
+        expect(repository.isInputClosed()).toBe(false);
+    })
 })
