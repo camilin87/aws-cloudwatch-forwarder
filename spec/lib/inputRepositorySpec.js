@@ -60,4 +60,10 @@ describe("inputRepository", () => {
 
         expect(repository.isInputClosed()).toBe(true);
     })
+
+    it ("there are no lines by default", () => {
+        var repository = inputRepository(readlineMock, processMock);
+
+        expect(repository.getLines()).toEqual([]);
+    })
 })
