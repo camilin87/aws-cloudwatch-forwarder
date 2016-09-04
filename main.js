@@ -1,20 +1,8 @@
-var readline = require("readline");
+var rfr = require("rfr");
+var inputRepository = rfr("lib/inputRepository")();
 var promise = require("the-promise-factory");
 
-var rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-  terminal: false
-});
-
-var isListening = true;
-var lines = [];
-
-rl.on("line", l => lines.push(l));
-rl.on("close", () => isListening = false);
-
 console.log("FF_AWS_REGION", process.env.AWS_REGION)
-
 
 initAWS()
     .then((awsInfo) => {
@@ -55,7 +43,7 @@ function initAWS(){
 
 function sendLogs(awsInfo){
     return promise.create((fulfill, reject) => {
-        if (shouldStopSendingLogs()){
+        if (inputRepository.isInputClosed()){
             fulfill();
         }
 
@@ -66,12 +54,10 @@ function sendLogs(awsInfo){
     });
 }
 
-function shouldStopSendingLogs(){
-    return isListening === false && lines.length === 0;
-}
-
 function sendAvailableLogLines(awsInfo){
     return promise.create((fulfill, reject) => {
+        var lines = inputRepository.getLines();
+
         if (lines.length === 0){
 
             console.log("X".repeat(30));
@@ -87,11 +73,11 @@ function sendAvailableLogLines(awsInfo){
 
         if (lines.length < 10){
             linesToSend = lines;
-            lines = [];
+            inputRepository.setLines([]);
         }
         else {
             linesToSend = lines.slice(0, 10);
-            lines = lines.slice(10)
+            inputRepository.setLines(lines.slice(10));
         }
 
         //TODO: implement the real sender

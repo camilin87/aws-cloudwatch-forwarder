@@ -21,6 +21,9 @@
     "aws-sdk": "^2.5.5",
     "rfr": "^1.2.3"
   },
+  "bundledDependencies": [
+    "rfr"
+  ],
   "devDependencies": {
     "jasmine": "^2.4.1"
   }
