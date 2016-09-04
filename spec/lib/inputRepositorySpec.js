@@ -83,6 +83,14 @@ describe("inputRepository", () => {
         ]);
     })
 
+    it ("the lines cannot be set to null", () => {
+        var repository = inputRepository(readlineMock, processMock);
+
+        repository.setLines(null);
+
+        expect(repository.getLines()).toEqual([]);
+    })
+
     it ("isInputClosed is false when the stream is closed but there are lines", () => {
         var repository = inputRepository(readlineMock, processMock);
 
