@@ -66,4 +66,20 @@ describe("inputRepository", () => {
 
         expect(repository.getLines()).toEqual([]);
     })
+
+    it ("sets the lines", () => {
+        var repository = inputRepository(readlineMock, processMock);
+
+        repository.setLines([
+            "line 1",
+            "line 2",
+            "line 3",
+        ]);
+
+        expect(repository.getLines()).toEqual([
+            "line 1",
+            "line 2",
+            "line 3",
+        ]);
+    })
 })
