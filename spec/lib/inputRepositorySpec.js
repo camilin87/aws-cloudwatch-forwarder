@@ -82,4 +82,17 @@ describe("inputRepository", () => {
             "line 3",
         ]);
     })
+
+    it ("isInputClosed is false when the stream is closed but there are lines", () => {
+        var repository = inputRepository(readlineMock, processMock);
+
+        repository.setLines([
+            "line 1",
+            "line 2",
+            "line 3",
+        ]);
+        closeInputStream();
+
+        expect(repository.isInputClosed()).toBe(false);
+    })
 })
