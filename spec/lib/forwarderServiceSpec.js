@@ -20,14 +20,16 @@ describe("forwarderService", function() {
     }
 
     describe("init", () => {
+        var initConfig = {
+            aws: {
+                logGroupName: "the-log-groupname"
+            }
+        };
+
         it ("determines if the log group exists", (done) => {
             describeLogGroupsWillReturn({});
 
-            service.init({
-                aws: {
-                    logGroupName: "the-log-groupname"
-                }
-            }).then(() => {
+            service.init(initConfig).then(() => {
                 expect(cloudwatchLogsStub.describeLogGroups).toHaveBeenCalledWith({
                     logGroupNamePrefix: "the-log-groupname"
                 }, jasmine.any(Function));
@@ -40,11 +42,7 @@ describe("forwarderService", function() {
                 callback("something went wrong");
             });
 
-            service.init({
-                aws: {
-                    logGroupName: "the-log-groupname"
-                }
-            }).then(null, (err) => {
+            service.init(initConfig).then(null, (err) => {
                 expect(err).toBe("something went wrong");
                 done();
             })
