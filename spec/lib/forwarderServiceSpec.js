@@ -7,7 +7,8 @@ describe("forwarderService", function() {
 
     beforeEach(() => {
         cloudwatchLogsStub = {
-            describeLogGroups: () => {}
+            describeLogGroups: () => {},
+            createLogGroup: () => {}
         }
 
         service = forwarderService(cloudwatchLogsStub);
@@ -44,6 +45,18 @@ describe("forwarderService", function() {
 
             service.init(initConfig).then(null, (err) => {
                 expect(err).toBe("something went wrong");
+                done();
+            })
+        })
+
+        it ("creates a log group if it doesn't already exists", (done) => {
+            describeLogGroupsWillReturn({});
+            spyOn(cloudwatchLogsStub, "createLogGroup");
+
+            service.init(initConfig).then(() => {
+                expect(cloudwatchLogsStub.createLogGroup).toHaveBeenCalledWith({
+                    logGroupName: "the-log-groupname"
+                }, jasmine.any(Function));
                 done();
             })
         })
