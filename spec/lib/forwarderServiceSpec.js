@@ -13,11 +13,15 @@ describe("forwarderService", function() {
         service = forwarderService(cloudwatchLogsStub);
     })
 
+    function describeLogGroupsWillReturn(data) {
+        spyOn(cloudwatchLogsStub, "describeLogGroups").and.callFake((info, callback) => {
+            callback(null, data);
+        });
+    }
+
     describe("init", () => {
         it ("determines if the log group exists", (done) => {
-            spyOn(cloudwatchLogsStub, "describeLogGroups").and.callFake((info, callback) => {
-                callback(null, {});
-            });
+            describeLogGroupsWillReturn({});
 
             service.init({
                 aws: {
