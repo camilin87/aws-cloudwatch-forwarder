@@ -50,7 +50,6 @@ describe("forwarderService", function() {
 
     function putLogEventsWillSucceed(){
         spyOn(cloudwatchLogsStub, "putLogEvents").and.callFake((info, callback) => {
-            // console.log("putLogEventsMock")
             callback(null);
         });
     }
@@ -261,6 +260,19 @@ describe("forwarderService", function() {
                             logGroupName: "the-log-groupname",
                             logStreamName: "the-log-stream"
                         }, jasmine.any(Function))
+                        done()
+                    })
+            })
+
+            it ("fails when log transmission failed", done => {
+                spyOn(cloudwatchLogsStub, "putLogEvents").and.callFake((info, callback) => {
+                    callback("something went wrong");
+                });
+
+                service
+                    .send(generateMessages(2))
+                    .then(null, (err) => {
+                        expect(err).toBe("something went wrong")
                         done()
                     })
             })
