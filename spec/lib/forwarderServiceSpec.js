@@ -213,6 +213,18 @@ describe("forwarderService", function() {
     })
 
     describe("send", () => {
+
+        function generateMessages(count){
+            var result = []
+            for (var i = 0; i < count; i++){
+                result.push({
+                    timespan: i,
+                    message: `line ${i + 1}`
+                })
+            }
+            return result
+        }
+
         describe("on new streams", () => {
             beforeEach(() => {
                 describeLogGroupsWillReturn({})
@@ -220,12 +232,19 @@ describe("forwarderService", function() {
                 describeLogStreamsWillReturn({})
                 createLogStreamWillSucceed()
 
-                cloudwatchLogsStub.init()
+                service.init(initConfig)
             })
 
-            // it ("sends the correct events", done => {
-            //     cloudwatchLogsStub.send([])
-            // })
+            it ("does not transmit anything when there are no messages", done => {
+                putLogEventsWillSucceed()
+
+                service
+                    .send(generateMessages(0))
+                    .then(() => {
+                        expect(cloudwatchLogsStub.putLogEvents).not.toHaveBeenCalled()
+                        done()
+                    })
+            })
         })
     })
 })
