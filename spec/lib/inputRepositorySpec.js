@@ -12,6 +12,8 @@ describe("inputRepository", () => {
     var rlStub = null;
     var rlCallbacks = null;
 
+    var repository = null;
+
     beforeEach(() => {
         rlCallbacks = {};
         rlStub = {
@@ -27,6 +29,8 @@ describe("inputRepository", () => {
                 return rlStub;
             }
         };
+
+        repository = inputRepository(readlineMock, processMock);
     })
 
     function sendLine(line) {
@@ -38,8 +42,6 @@ describe("inputRepository", () => {
     }
 
     it ("initializes the readline module with the correct parameters", () => {
-        inputRepository(readlineMock, processMock);
-
         expect(createdInterface).toEqual({
             input: "the std in",
             output: "the std out",
@@ -48,28 +50,20 @@ describe("inputRepository", () => {
     })
 
     it ("isInputClosed is false by default", () => {
-        var repository = inputRepository(readlineMock, processMock);
-
         expect(repository.isInputClosed()).toBe(false);
     })
 
     it ("isInputClosed is true when there are no lines and the stream was closed", () => {
-        var repository = inputRepository(readlineMock, processMock);
-
         closeInputStream();
 
         expect(repository.isInputClosed()).toBe(true);
     })
 
     it ("there are no lines by default", () => {
-        var repository = inputRepository(readlineMock, processMock);
-
         expect(repository.getLines()).toEqual([]);
     })
 
     it ("reads the lines", () => {
-        var repository = inputRepository(readlineMock, processMock);
-
         sendLine("line 1");
         sendLine("line 2")
         sendLine("line 3")
@@ -82,8 +76,6 @@ describe("inputRepository", () => {
     })
 
     it ("sets the lines", () => {
-        var repository = inputRepository(readlineMock, processMock);
-
         repository.setLines([
             "line 1",
             "line 2",
@@ -98,16 +90,12 @@ describe("inputRepository", () => {
     })
 
     it ("the lines cannot be set to null", () => {
-        var repository = inputRepository(readlineMock, processMock);
-
         repository.setLines(null);
 
         expect(repository.getLines()).toEqual([]);
     })
 
     it ("isInputClosed is false when the stream is closed but there are lines", () => {
-        var repository = inputRepository(readlineMock, processMock);
-
         repository.setLines([
             "line 1",
             "line 2",
