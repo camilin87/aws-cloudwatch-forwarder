@@ -9,7 +9,8 @@ describe("forwarderService", function() {
         cloudwatchLogsStub = {
             describeLogGroups: () => {},
             createLogGroup: () => {},
-            describeLogStreams: () => {}
+            describeLogStreams: () => {},
+            createLogStream: () => {}
         }
 
         service = forwarderService(cloudwatchLogsStub);
@@ -33,6 +34,12 @@ describe("forwarderService", function() {
         });
     }
 
+    function createLogStreamWillSucceed(){
+        spyOn(cloudwatchLogsStub, "createLogStream").and.callFake((info, callback) => {
+            callback(null);
+        });
+    }
+
     describe("init", () => {
         var initConfig = {
             aws: {
@@ -45,6 +52,7 @@ describe("forwarderService", function() {
             describeLogGroupsWillReturn({})
             createLogGroupsWillSucceed()
             describeLogStreamsWillReturn({})
+            createLogStreamWillSucceed()
 
             service.init(initConfig).then(() => {
                 expect(cloudwatchLogsStub.describeLogGroups).toHaveBeenCalledWith({
@@ -69,6 +77,7 @@ describe("forwarderService", function() {
             describeLogGroupsWillReturn({})
             createLogGroupsWillSucceed()
             describeLogStreamsWillReturn({})
+            createLogStreamWillSucceed()
 
             service.init(initConfig).then(() => {
                 expect(cloudwatchLogsStub.createLogGroup).toHaveBeenCalledWith({
@@ -99,6 +108,7 @@ describe("forwarderService", function() {
             });
             createLogGroupsWillSucceed()
             describeLogStreamsWillReturn({})
+            createLogStreamWillSucceed()
 
             service.init(initConfig).then(() => {
                 expect(cloudwatchLogsStub.createLogGroup).not.toHaveBeenCalled()
@@ -110,6 +120,7 @@ describe("forwarderService", function() {
             describeLogGroupsWillReturn({})
             createLogGroupsWillSucceed()
             describeLogStreamsWillReturn({})
+            createLogStreamWillSucceed()
 
             service.init(initConfig).then(() => {
                 expect(cloudwatchLogsStub.describeLogStreams).toHaveBeenCalledWith({
@@ -120,7 +131,7 @@ describe("forwarderService", function() {
             })
         })
 
-        it ("fails when the log streams could not be read", (done) => {
+        it ("fails when the log streams could not be read", done => {
             describeLogGroupsWillReturn({})
             createLogGroupsWillSucceed()
             spyOn(cloudwatchLogsStub, "describeLogStreams").and.callFake((info, callback) => {
@@ -130,6 +141,52 @@ describe("forwarderService", function() {
             service.init(initConfig).then(null, (err) => {
                 expect(err).toBe("something went wrong");
                 done();
+            })
+        })
+
+        it ("creates the log stream if it doesn't exist", done => {
+            describeLogGroupsWillReturn({})
+            createLogGroupsWillSucceed()
+            describeLogStreamsWillReturn({})
+            createLogStreamWillSucceed()
+
+            service.init(initConfig).then(() => {
+                expect(cloudwatchLogsStub.createLogStream).toHaveBeenCalledWith({
+                    logGroupName: "the-log-groupname",
+                    logStreamName: "the-log-stream"
+                }, jasmine.any(Function))
+                done()
+            })
+        })
+
+        it ("fails when the log stream could not be created", done => {
+            describeLogGroupsWillReturn({})
+            createLogGroupsWillSucceed()
+            describeLogStreamsWillReturn({})
+            spyOn(cloudwatchLogsStub, "createLogStream").and.callFake((info, callback) => {
+                callback("something went wrong")
+            })
+
+            service.init(initConfig).then(null, (err) => {
+                expect(err).toBe("something went wrong");
+                done();
+            })
+        })
+
+        it ("does not create the log stream if it already exist", done => {
+            describeLogGroupsWillReturn({})
+            createLogGroupsWillSucceed()
+            describeLogStreamsWillReturn({
+                logStreams: [
+                    {logStreamName: "pepitin"},
+                    {logStreamName: "the-log-stream"}
+                ]
+            })
+            createLogStreamWillSucceed()
+
+            service.init(initConfig).then(() => {
+                expect(cloudwatchLogsStub.createLogStream).not.toHaveBeenCalled()
+                done()
             })
         })
     })
