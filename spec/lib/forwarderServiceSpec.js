@@ -55,6 +55,20 @@ describe("forwarderService", function() {
     }
 
     describe("init", () => {
+        it ("requires a log group name", () => {
+            expect(() => service.init()).toThrow(new Error("a logGroupName is required"))
+        })
+
+        it ("requires a log stream name", () => {
+            var config = {
+                aws: {
+                    logGroupName: "aaa"
+                }
+            }
+
+            expect(() => service.init(config)).toThrow(new Error("a logStreamName is required"))
+        })
+
         it ("determines if the log group exists", done => {
             describeLogGroupsWillReturn({})
             createLogGroupsWillSucceed()
