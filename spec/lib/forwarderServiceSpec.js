@@ -20,6 +20,12 @@ describe("forwarderService", function() {
         });
     }
 
+    function createLogGroupsWillSucceed(){
+        spyOn(cloudwatchLogsStub, "createLogGroup").and.callFake((info, callback) => {
+            callback(null);
+        });
+    }
+
     describe("init", () => {
         var initConfig = {
             aws: {
@@ -29,6 +35,7 @@ describe("forwarderService", function() {
 
         it ("determines if the log group exists", done => {
             describeLogGroupsWillReturn({});
+            createLogGroupsWillSucceed();
 
             service.init(initConfig).then(() => {
                 expect(cloudwatchLogsStub.describeLogGroups).toHaveBeenCalledWith({
@@ -51,7 +58,7 @@ describe("forwarderService", function() {
 
         it ("creates a log group if it doesn't already exists", done => {
             describeLogGroupsWillReturn({});
-            spyOn(cloudwatchLogsStub, "createLogGroup");
+            createLogGroupsWillSucceed();
 
             service.init(initConfig).then(() => {
                 expect(cloudwatchLogsStub.createLogGroup).toHaveBeenCalledWith({
@@ -80,7 +87,7 @@ describe("forwarderService", function() {
                     {logGroupName: "the-log-groupname"}
                 ]
             });
-            spyOn(cloudwatchLogsStub, "createLogGroup");
+            createLogGroupsWillSucceed();
 
             service.init(initConfig).then(() => {
                 expect(cloudwatchLogsStub.createLogGroup).not.toHaveBeenCalled();
