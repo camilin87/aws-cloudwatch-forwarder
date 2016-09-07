@@ -30,7 +30,13 @@ describe("inputRepository", () => {
             }
         };
 
-        repository = inputRepository(readlineMock, processMock);
+        var invocationCount = 0;
+        var currentTime = () => {
+            invocationCount += 1;
+            return invocationCount;
+        }
+
+        repository = inputRepository(readlineMock, processMock, currentTime);
     })
 
     function sendLine(line) {
@@ -69,23 +75,23 @@ describe("inputRepository", () => {
         sendLine("line 3")
 
         expect(repository.getLines()).toEqual([
-            "line 1",
-            "line 2",
-            "line 3"
+            {timestamp: 1, message: "line 1"},
+            {timestamp: 2, message: "line 2"},
+            {timestamp: 3, message: "line 3"}
         ]);
     })
 
     it ("sets the lines", () => {
         repository.setLines([
-            "line 1",
-            "line 2",
-            "line 3",
+            {timestamp: 10, message: "line 1"},
+            {timestamp: 20, message: "line 2"},
+            {timestamp: 30, message: "line 3"}
         ]);
 
         expect(repository.getLines()).toEqual([
-            "line 1",
-            "line 2",
-            "line 3"
+            {timestamp: 10, message: "line 1"},
+            {timestamp: 20, message: "line 2"},
+            {timestamp: 30, message: "line 3"}
         ]);
     })
 

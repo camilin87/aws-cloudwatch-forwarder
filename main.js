@@ -81,7 +81,7 @@ function sendAvailableLogLines(awsInfo){
         }
 
         //TODO: implement the real sender
-        console.log("FF: ", linesToSend.map(l => l.toString()).join(","));
+        console.log("FF: ", linesToSend.map(l => l.message.toString()).join(","));
         var updatedAwsInfo = awsInfo;
         fulfill(updatedAwsInfo)
     })
