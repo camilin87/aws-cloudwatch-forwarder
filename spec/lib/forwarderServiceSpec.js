@@ -1,4 +1,5 @@
 var rfr = require("rfr");
+var async = require("async")
 var forwarderService = rfr("lib/forwarderService");
 
 describe("forwarderService", function() {
@@ -284,16 +285,55 @@ describe("forwarderService", function() {
                     })
             })
 
-            xit ("sends the correct sequence token in subsequent responses", done => {
+            it ("sends the correct sequence token in subsequent responses", done => {
                 var nextSequenceToken = 1000
                 putLogEventsWillSucceed(() => {
                     nextSequenceToken += 1
                     return nextSequenceToken
                 })
+                function sendOneMessage(callback){
+                    service.send(generateMessages(1))
+                        .then(() => callback(null), callback)
+                }
+                async.series([
+                    sendOneMessage,
+                    sendOneMessage,
+                    sendOneMessage
+                ], err => {
+                    if (err){
+                        jasmine.getEnv().fail("sending messages failed")
+                        done()
+                        return
+                    }
 
-                //TODO: finish this
-                service
-                    .send(generateMessages(2))
+                    expect(cloudwatchLogsStub.putLogEvents).toHaveBeenCalledWith({
+                        logEvents: [
+                            {timestamp: 0, message: "line 1"}
+                        ],
+                        logGroupName: "the-log-groupname",
+                        logStreamName: "the-log-stream"
+                    }, jasmine.any(Function))
+
+                    expect(cloudwatchLogsStub.putLogEvents).toHaveBeenCalledWith({
+                        logEvents: [
+                            {timestamp: 0, message: "line 1"}
+                        ],
+                        logGroupName: "the-log-groupname",
+                        logStreamName: "the-log-stream",
+                        sequenceToken: 1001
+                    }, jasmine.any(Function))
+
+                    expect(cloudwatchLogsStub.putLogEvents).toHaveBeenCalledWith({
+                        logEvents: [
+                            {timestamp: 0, message: "line 1"}
+                        ],
+                        logGroupName: "the-log-groupname",
+                        logStreamName: "the-log-stream",
+                        sequenceToken: 1002
+                    }, jasmine.any(Function))
+
+                    done()
+                })
             })
         })
     })
