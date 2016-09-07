@@ -295,6 +295,7 @@ describe("forwarderService", function() {
                     service.send(generateMessages(1))
                         .then(() => callback(null), callback)
                 }
+
                 async.series([
                     sendOneMessage,
                     sendOneMessage,
@@ -334,6 +335,40 @@ describe("forwarderService", function() {
 
                     done()
                 })
+            })
+        })
+
+        describe("on existing streams", () => {
+            beforeEach(() => {
+                describeLogGroupsWillReturn({})
+                createLogGroupsWillSucceed()
+                describeLogStreamsWillReturn({
+                    logStreams: [
+                        {logStreamName: "pepitin"},
+                        {logStreamName: "the-log-stream", uploadSequenceToken: 2000}
+                    ]
+                })
+
+                service.init(initConfig)
+            })
+
+            it ("sends the correct information", done => {
+                putLogEventsWillSucceed()
+
+                service
+                    .send(generateMessages(2))
+                    .then(() => {
+                        expect(cloudwatchLogsStub.putLogEvents).toHaveBeenCalledWith({
+                            logEvents: [
+                                {timestamp: 0, message: "line 1"},
+                                {timestamp: 1, message: "line 2"}
+                            ],
+                            logGroupName: "the-log-groupname",
+                            logStreamName: "the-log-stream",
+                            sequenceToken: 2000
+                        }, jasmine.any(Function))
+                        done()
+                    })
             })
         })
     })
