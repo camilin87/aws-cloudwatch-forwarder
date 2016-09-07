@@ -48,9 +48,16 @@ describe("forwarderService", function() {
         });
     }
 
-    function putLogEventsWillSucceed(){
+    function putLogEventsWillSucceed(sequenceTokenGenerator){
+        if (!sequenceTokenGenerator){
+            sequenceTokenGenerator = () => null
+        }
+
         spyOn(cloudwatchLogsStub, "putLogEvents").and.callFake((info, callback) => {
-            callback(null);
+            var data = {
+                nextSequenceToken: sequenceTokenGenerator()
+            }
+            callback(null, data)
         });
     }
 
@@ -275,6 +282,18 @@ describe("forwarderService", function() {
                         expect(err).toBe("something went wrong")
                         done()
                     })
+            })
+
+            xit ("sends the correct sequence token in subsequent responses", done => {
+                var nextSequenceToken = 1000
+                putLogEventsWillSucceed(() => {
+                    nextSequenceToken += 1
+                    return nextSequenceToken
+                })
+
+                //TODO: finish this
+                service
+                    .send(generateMessages(2))
             })
         })
     })
