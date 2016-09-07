@@ -2,6 +2,13 @@ var rfr = require("rfr");
 var forwarderService = rfr("lib/forwarderService");
 
 describe("forwarderService", function() {
+    var initConfig = {
+        aws: {
+            logGroupName: "the-log-groupname",
+            logStreamName: "the-log-stream"
+        }
+    };
+
     var service = null;
     var cloudwatchLogsStub = null;
 
@@ -10,7 +17,8 @@ describe("forwarderService", function() {
             describeLogGroups: () => {},
             createLogGroup: () => {},
             describeLogStreams: () => {},
-            createLogStream: () => {}
+            createLogStream: () => {},
+            putLogEvents: () => {}
         }
 
         service = forwarderService(cloudwatchLogsStub);
@@ -40,14 +48,13 @@ describe("forwarderService", function() {
         });
     }
 
-    describe("init", () => {
-        var initConfig = {
-            aws: {
-                logGroupName: "the-log-groupname",
-                logStreamName: "the-log-stream"
-            }
-        };
+    function putLogEventsWillSucceed(){
+        spyOn(cloudwatchLogsStub, "putLogEvents").and.callFake((info, callback) => {
+            callback(null);
+        });
+    }
 
+    describe("init", () => {
         it ("determines if the log group exists", done => {
             describeLogGroupsWillReturn({})
             createLogGroupsWillSucceed()
@@ -188,6 +195,23 @@ describe("forwarderService", function() {
                 expect(cloudwatchLogsStub.createLogStream).not.toHaveBeenCalled()
                 done()
             })
+        })
+    })
+
+    describe("send", () => {
+        describe("on new streams", () => {
+            beforeEach(() => {
+                describeLogGroupsWillReturn({})
+                createLogGroupsWillSucceed()
+                describeLogStreamsWillReturn({})
+                createLogStreamWillSucceed()
+
+                cloudwatchLogsStub.init()
+            })
+
+            // it ("sends the correct events", done => {
+            //     cloudwatchLogsStub.send([])
+            // })
         })
     })
 })
