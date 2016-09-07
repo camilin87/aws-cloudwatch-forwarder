@@ -50,6 +50,7 @@ describe("forwarderService", function() {
 
     function putLogEventsWillSucceed(){
         spyOn(cloudwatchLogsStub, "putLogEvents").and.callFake((info, callback) => {
+            // console.log("putLogEventsMock")
             callback(null);
         });
     }
@@ -218,7 +219,7 @@ describe("forwarderService", function() {
             var result = []
             for (var i = 0; i < count; i++){
                 result.push({
-                    timespan: i,
+                    timestamp: i,
                     message: `line ${i + 1}`
                 })
             }
@@ -242,6 +243,24 @@ describe("forwarderService", function() {
                     .send(generateMessages(0))
                     .then(() => {
                         expect(cloudwatchLogsStub.putLogEvents).not.toHaveBeenCalled()
+                        done()
+                    })
+            })
+
+            it ("sends the correct information", done => {
+                putLogEventsWillSucceed()
+
+                service
+                    .send(generateMessages(2))
+                    .then(() => {
+                        expect(cloudwatchLogsStub.putLogEvents).toHaveBeenCalledWith({
+                            logEvents: [
+                                {timestamp: 0, message: "line 1"},
+                                {timestamp: 1, message: "line 2"}
+                            ],
+                            logGroupName: "the-log-groupname",
+                            logStreamName: "the-log-stream"
+                        }, jasmine.any(Function))
                         done()
                     })
             })
