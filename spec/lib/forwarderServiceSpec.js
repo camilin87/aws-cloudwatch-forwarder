@@ -3,6 +3,7 @@ var promise = require("the-promise-factory")
 var forwarderService = rfr("lib/forwarderService")
 
 describe("forwarderService", () => {
+    var seededConfig = { name: "myconfig" }
 
     var service = null
     var forwarder1 = null
@@ -49,4 +50,16 @@ describe("forwarderService", () => {
         ])
     })
 
+    describe("init", () => {
+        it ("calls init on every forwarder", done => {
+            initWillSucceed(forwarder1)
+            initWillSucceed(forwarder2)
+
+            service.init(seededConfig).then(() => {
+                expect(forwarder1.init).toHaveBeenCalledWith(seededConfig)
+                expect(forwarder2.init).toHaveBeenCalledWith(seededConfig)
+                done()
+            })
+        })
+    })
 })
