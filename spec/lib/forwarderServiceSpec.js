@@ -72,4 +72,29 @@ describe("forwarderService", () => {
             })
         })
     })
+
+    describe("send", () => {
+        it ("calls send on every forwarder", done => {
+            var messages = ["msg 1", "msg 2"]
+            sendWillSucceed(forwarder1)
+            sendWillSucceed(forwarder2)
+
+            service.send(messages).then(() => {
+                expect(forwarder1.send).toHaveBeenCalledWith(messages)
+                expect(forwarder2.send).toHaveBeenCalledWith(messages)
+                done()
+            })
+        })
+
+        it ("fails when at least one forwarder fails", done => {
+            var messages = ["msg 1", "msg 2"]
+            sendWillSucceed(forwarder1)
+            sendWillFail(forwarder2, "something went wrong")
+
+            service.send(messages).then(null, err => {
+                expect(err).toBe("something went wrong")
+                done()
+            })
+        })
+    })
 })
