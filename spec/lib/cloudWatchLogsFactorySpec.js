@@ -11,7 +11,8 @@ describe("cloudWatchLogsFactory", () => {
         awsStub = {
             config: {
                 update: () => {}
-            }
+            },
+            CloudWatchLogs: function () {}
         }
 
         factory = cloudWatchLogsFactory(awsStub, envStub)
@@ -30,5 +31,13 @@ describe("cloudWatchLogsFactory", () => {
             accessKeyId: "accesskey",
             secretAccessKey: "secretkey"
         })
+    })
+
+    it ("creates the CloudWatchLogs service", () => {
+        awsStub.CloudWatchLogs = function (){
+            return {name: "service1"}
+        }
+
+        expect(factory.create()).toEqual({name: "service1"})
     })
 })
