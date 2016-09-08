@@ -25,4 +25,12 @@ describe("forwarderConfigReader", () => {
             }
         })
     })
+
+    it ("reads the std out forwarder config", () => {
+        envStub.FC_STDOUT_ENABLED = false
+
+        expect(reader.read().stdout).toEqual({
+            enabled: false
+        })
+    })
 })
