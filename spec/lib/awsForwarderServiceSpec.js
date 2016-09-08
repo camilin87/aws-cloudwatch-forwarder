@@ -1,8 +1,8 @@
 var rfr = require("rfr");
 var async = require("async")
-var forwarderService = rfr("lib/forwarderService");
+var awsForwarderService = rfr("lib/awsForwarderService")
 
-describe("forwarderService", function() {
+describe("awsForwarderService", function() {
     var initConfig = {
         aws: {
             logGroupName: "the-log-groupname",
@@ -22,7 +22,7 @@ describe("forwarderService", function() {
             putLogEvents: () => {}
         }
 
-        service = forwarderService(cloudwatchLogsStub);
+        service = awsForwarderService(cloudwatchLogsStub);
     })
 
     function describeLogGroupsWillReturn(data) {
