@@ -75,7 +75,7 @@ describe("forwarderService", () => {
 
     describe("send", () => {
         it ("calls send on every forwarder", done => {
-            var messages = ["msg 1", "msg 2"]
+            var messages = [{message: "msg 1", timestamp: 1}, {message: "msg 2", timestamp: 1}]
             sendWillSucceed(forwarder1)
             sendWillSucceed(forwarder2)
 
@@ -87,7 +87,7 @@ describe("forwarderService", () => {
         })
 
         it ("fails when at least one forwarder fails", done => {
-            var messages = ["msg 1", "msg 2"]
+            var messages = [{message: "msg 1", timestamp: 1}, {message: "msg 2", timestamp: 1}]
             sendWillSucceed(forwarder1)
             sendWillFail(forwarder2, "something went wrong")
 
@@ -95,6 +95,18 @@ describe("forwarderService", () => {
                 expect(err).toBe("something went wrong")
                 done()
             })
+        })
+
+        it ("fails when the logLines don't have a message", () => {
+            var messages = [{message: "msg 1", timestamp: 1}, "msg 2"]
+
+            expect(() => service.send(messages)).toThrow(new Error("Invalid input. message field missing"))
+        })
+
+        it ("fails when the logLines don't have a timestamp", () => {
+            var messages = [{message: "msg 1", timestamp: 1}, {message: "msg 2"}]
+
+            expect(() => service.send(messages)).toThrow(new Error("Invalid input. timestamp field missing"))
         })
     })
 })
