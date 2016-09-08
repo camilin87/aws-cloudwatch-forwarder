@@ -61,5 +61,15 @@ describe("forwarderService", () => {
                 done()
             })
         })
+
+        it ("fails when at least one forwarder fails", done => {
+            initWillSucceed(forwarder1)
+            initWillFail(forwarder2, "something went wrong")
+
+            service.init(seededConfig).then(null, err => {
+                expect(err).toBe("something went wrong")
+                done()
+            })
+        })
     })
 })
