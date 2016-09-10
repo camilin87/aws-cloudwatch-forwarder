@@ -1,4 +1,5 @@
 var rfr = require("rfr")
+var promise = require("the-promise-factory")
 var forwarderFn = rfr("lib/forwarder")
 
 describe("forwarder", () => {
@@ -33,5 +34,16 @@ describe("forwarder", () => {
             forwarderServiceFactoryStub,
             forwarderConfigReaderStub
         )
+    })
+
+    it ("inits the forwarder service", done => {
+        spyOn(forwarderServiceStub, "init").and.callFake(() => promise.create((fulfill, reject) => {
+            fulfill()
+        }))
+
+        forwarder.run().then(() => {
+            expect(forwarderServiceStub.init).toHaveBeenCalledWith(seededForwarderConfig)
+            done()
+        })
     })
 })
