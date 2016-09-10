@@ -7,10 +7,10 @@ var forwarderService = forwarderServiceFactory.create()
 
 console.log("FF_AWS_REGION", process.env.AWS_REGION)
 
-initAWS()
-    .then((awsInfo) => {
+initForwarder()
+    .then(() => {
 
-        sendLogs(awsInfo)
+        sendLogs()
             .then(() => {
                 console.log("FF_COMPLETED");
                 process.exit(0);
@@ -25,47 +25,31 @@ initAWS()
     })
 
 
-function initAWS(){
+function initForwarder(){
     return promise.create((fulfill, reject) => {
         var config = forwarderConfigReader.read()
         console.log("FF_CONFIG", config)
 
         forwarderService
             .init(config)
-            .then(() => {
-                //TODO simply call fulfill and remove all of this
-
-                setTimeout(() => {
-                    fulfill({
-                        logParameters: {
-                            logGroupName: "logGroupName",
-                            logStreamName: "logStreamName",
-                            sequenceToken: "000001"
-                        },
-                        logWriter: {
-                            putLogEvents: () => {}
-                        }
-                    })
-                }, 1000)
-
-            }, reject)
+            .then(fulfill, reject)
     });
 }
 
-function sendLogs(awsInfo){
+function sendLogs(){
     return promise.create((fulfill, reject) => {
         if (inputRepository.isInputClosed()){
             fulfill();
         }
 
-        sendAvailableLogLines(awsInfo)
-            .then((updatedAwsInfo) => {
-                sendLogs(updatedAwsInfo).then(fulfill, reject);
+        sendAvailableLogLines()
+            .then(() => {
+                sendLogs().then(fulfill, reject);
             }, reject);
     });
 }
 
-function sendAvailableLogLines(awsInfo){
+function sendAvailableLogLines(){
     return promise.create((fulfill, reject) => {
         var lines = inputRepository.getLines();
 
@@ -74,7 +58,7 @@ function sendAvailableLogLines(awsInfo){
             console.log("X".repeat(30));
 
             setTimeout(() => {
-                fulfill(awsInfo);
+                fulfill();
             }, 2000);
 
             return;
@@ -91,12 +75,8 @@ function sendAvailableLogLines(awsInfo){
             inputRepository.setLines(lines.slice(10));
         }
 
-        //TODO remove the aws info
         forwarderService
             .send(linesToSend)
-            .then(() => {
-                var updatedAwsInfo = awsInfo;
-                fulfill(updatedAwsInfo)
-            }, reject)
+            .then(fulfill, reject)
     })
 }
