@@ -8,6 +8,7 @@ describe("forwarder", () => {
     var seededForwarderConfig = {name: "the forwarder config"}
     var inputRepositoryStub = null
     var forwarderServiceStub = null
+    var setTimeoutStub = null
 
     beforeEach(() => {
         inputRepositoryStub = {
@@ -29,10 +30,15 @@ describe("forwarder", () => {
             read: () => seededForwarderConfig
         }
 
+        setTimeoutStub = jasmine.createSpy("setTimeoutStub").and.callFake((callback, ms) => {
+            callback()
+        })
+
         forwarder = forwarderFn(
             inputRepositoryStub,
             forwarderServiceFactoryStub,
-            forwarderConfigReaderStub
+            forwarderConfigReaderStub,
+            setTimeoutStub
         )
     })
 
