@@ -42,10 +42,14 @@ describe("forwarder", () => {
         )
     })
 
-    it ("inits the forwarder service", done => {
+    function initWillSucceed(){
         spyOn(forwarderServiceStub, "init").and.callFake(() => promise.create((fulfill, reject) => {
             fulfill()
         }))
+    }
+
+    it ("inits the forwarder service", done => {
+        initWillSucceed()
 
         forwarder.run().then(() => {
             expect(forwarderServiceStub.init).toHaveBeenCalledWith(seededForwarderConfig)
