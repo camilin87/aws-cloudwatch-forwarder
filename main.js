@@ -7,7 +7,11 @@ var forwarderService = forwarderServiceFactory.create()
 
 console.log("FF_AWS_REGION", process.env.AWS_REGION)
 
-initForwarder()
+var config = forwarderConfigReader.read()
+console.log("FF_CONFIG", config)
+
+forwarderService
+    .init(config)
     .then(() => {
 
         sendLogs()
@@ -24,17 +28,6 @@ initForwarder()
         process.exit(1);
     })
 
-
-function initForwarder(){
-    return promise.create((fulfill, reject) => {
-        var config = forwarderConfigReader.read()
-        console.log("FF_CONFIG", config)
-
-        forwarderService
-            .init(config)
-            .then(fulfill, reject)
-    });
-}
 
 function sendLogs(){
     return promise.create((fulfill, reject) => {
