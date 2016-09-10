@@ -150,6 +150,7 @@ describe("forwarder", () => {
 
     it ("does not wait if there are lines", done => {
         initWillSucceed()
+        sendWillSucceed()
         isInputClosed = false
 
         var getLinesCallIdx = 0
@@ -166,6 +167,45 @@ describe("forwarder", () => {
         forwarder.run().then(() => {
             expect(getLinesCallIdx).toBe(3)
             expect(setTimeoutStub).not.toHaveBeenCalled()
+            done()
+        })
+    })
+
+    it ("sends the available lines", done => {
+        initWillSucceed()
+        sendWillSucceed()
+        isInputClosed = false
+
+        var getLinesCallIdx = 0
+        getLinesWillReturn(() => {
+            getLinesCallIdx++
+
+            if (getLinesCallIdx === 3){
+                isInputClosed = true
+            }
+
+            return generateLines(2)
+        })
+
+        forwarder.run().then(() => {
+            expect(forwarderServiceStub.send.calls.count()).toEqual(3);
+            expect(forwarderServiceStub.send.calls.argsFor(0)).toEqual([["line 1", "line 2"]]);
+            expect(forwarderServiceStub.send.calls.argsFor(1)).toEqual([["line 1", "line 2"]]);
+            expect(forwarderServiceStub.send.calls.argsFor(2)).toEqual([["line 1", "line 2"]]);
+            done()
+        })
+    })
+
+    it ("sends the available lines", done => {
+        initWillSucceed()
+        isInputClosed = false
+        getLinesWillReturn(() => generateLines(2))
+        spyOn(forwarderServiceStub, "send").and.callFake(() => promise.create((fulfill, reject) => {
+            reject("something went wrong")
+        }))
+
+        forwarder.run().then(null, err => {
+            expect(err).toBe("something went wrong")
             done()
         })
     })
