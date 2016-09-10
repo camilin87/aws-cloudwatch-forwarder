@@ -13,9 +13,7 @@ describe("forwarder", () => {
     var isInputClosed = null
     var setLinesInvocations = null
 
-    beforeAll(() => {
-        spyOn(console, "log")
-    })
+    beforeAll(() => spyOn(console, "log"))
 
     beforeEach(() => {
         setLinesInvocations = []
@@ -52,6 +50,12 @@ describe("forwarder", () => {
 
     function initWillSucceed(){
         spyOn(forwarderServiceStub, "init").and.callFake(() => promise.create((fulfill, reject) => {
+            fulfill()
+        }))
+    }
+
+    function sendWillSucceed(){
+        spyOn(forwarderServiceStub, "send").and.callFake(() => promise.create((fulfill, reject) => {
             fulfill()
         }))
     }
