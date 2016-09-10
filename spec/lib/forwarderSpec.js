@@ -46,4 +46,15 @@ describe("forwarder", () => {
             done()
         })
     })
+
+    it ("fails when the forwarder could not be initialized", done => {
+        spyOn(forwarderServiceStub, "init").and.callFake(() => promise.create((fulfill, reject) => {
+            reject("something went wrong")
+        }))
+
+        forwarder.run().then(null, err => {
+            expect(err).toBe("something went wrong")
+            done()
+        })
+    })
 })
