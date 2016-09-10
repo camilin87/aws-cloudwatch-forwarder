@@ -50,12 +50,15 @@ describe("forwarder", () => {
         }))
     }
 
-    function getLinesWillReturn(seededLines){
-        spyOn(inputRepositoryStub, "getLines").and.returnValue(seededLines || [])
+    function getLinesWillReturn(callback){
+        spyOn(inputRepositoryStub, "getLines").and.callFake(() => {
+            return callback()
+        })
     }
 
     it ("inits the forwarder service", done => {
         initWillSucceed()
+        isInputClosed = true
 
         forwarder.run().then(() => {
             expect(forwarderServiceStub.init).toHaveBeenCalledWith(seededForwarderConfig)
@@ -77,10 +80,52 @@ describe("forwarder", () => {
     it ("does not read the available lines if the inputs is closed", done => {
         initWillSucceed()
         isInputClosed = true
-        getLinesWillReturn()
+        getLinesWillReturn(() => [])
 
         forwarder.run().then(() => {
             expect(inputRepositoryStub.getLines).not.toHaveBeenCalled()
+            done()
+        })
+    })
+
+    it ("reads the available log lines", done => {
+        initWillSucceed()
+        isInputClosed = false
+        var getLinesCallIdx = 0
+        getLinesWillReturn(() => {
+            getLinesCallIdx++
+
+            if (getLinesCallIdx === 2){
+                isInputClosed = true
+            }
+
+            return []
+        })
+
+        forwarder.run().then(() => {
+            expect(inputRepositoryStub.getLines).toHaveBeenCalled()
+            done()
+        })
+    })
+
+    it ("tries to reads the lines after intervals until the stream gets closed", done => {
+        initWillSucceed()
+        isInputClosed = false
+        var getLinesCallIdx = 0
+        getLinesWillReturn(() => {
+            getLinesCallIdx++
+
+            if (getLinesCallIdx === 5){
+                isInputClosed = true
+            }
+
+            return []
+        })
+
+        forwarder.run({readInterval: 1200}).then(() => {
+            expect(getLinesCallIdx).toBe(5)
+            expect(setTimeoutStub.calls.count()).toEqual(5);
+            expect(setTimeoutStub).toHaveBeenCalledWith(jasmine.any(Function), 1200)
             done()
         })
     })
