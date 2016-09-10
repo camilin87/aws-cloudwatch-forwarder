@@ -10,9 +10,11 @@ describe("forwarder", () => {
     var forwarderServiceStub = null
     var setTimeoutStub = null
 
+    var isInputClosed = null
+
     beforeEach(() => {
         inputRepositoryStub = {
-            isInputClosed: () => {},
+            isInputClosed: () => isInputClosed,
             getLines: () => {},
             setLines: () => {}
         }
@@ -48,6 +50,10 @@ describe("forwarder", () => {
         }))
     }
 
+    function getLinesWillReturn(seededLines){
+        spyOn(inputRepositoryStub, "getLines").and.returnValue(seededLines || [])
+    }
+
     it ("inits the forwarder service", done => {
         initWillSucceed()
 
@@ -64,6 +70,17 @@ describe("forwarder", () => {
 
         forwarder.run().then(null, err => {
             expect(err).toBe("something went wrong")
+            done()
+        })
+    })
+
+    it ("does not read the available lines if the inputs is closed", done => {
+        initWillSucceed()
+        isInputClosed = true
+        getLinesWillReturn()
+
+        forwarder.run().then(() => {
+            expect(inputRepositoryStub.getLines).not.toHaveBeenCalled()
             done()
         })
     })
