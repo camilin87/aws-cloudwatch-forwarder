@@ -27,7 +27,7 @@ describe("forwarderConfigReader", () => {
     })
 
     it ("reads the std out forwarder config from env settings", () => {
-        envStub.FC_STDOUT_ENABLED = false
+        envStub.FC_STDOUT_ENABLED = 'false'
 
         expect(reader.read().stdout).toEqual({
             enabled: false
@@ -37,8 +37,8 @@ describe("forwarderConfigReader", () => {
     it ("reads the aws forwarder config from env settings", () => {
         envStub.FC_AWS_LOG_GROUP_NAME = "env-log-group"
         envStub.FC_AWS_LOG_STREAM_NAME = "env-log-stream"
-        envStub.FC_AWS_DEBUG = true
-        envStub.FC_AWS_ENABLED = false
+        envStub.FC_AWS_DEBUG = 'true'
+        envStub.FC_AWS_ENABLED = 'false'
 
         expect(reader.read().aws).toEqual({
             logGroupName: "env-log-group",
