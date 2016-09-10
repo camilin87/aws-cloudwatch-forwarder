@@ -254,6 +254,34 @@ describe("awsForwarderService", function() {
                     })
             })
 
+            it ("does not transmit empty messages", done => {
+                putLogEventsWillSucceed()
+
+                var allMessages = generateMessages(10)
+                allMessages[0].message = null
+                allMessages[3].message = ""
+                allMessages[6].message = undefined
+
+                service
+                    .send(allMessages)
+                    .then(() => {
+                        expect(cloudwatchLogsStub.putLogEvents).toHaveBeenCalledWith({
+                            logEvents: [
+                                {timestamp: 1, message: "line 2"},
+                                {timestamp: 2, message: "line 3"},
+                                {timestamp: 4, message: "line 5"},
+                                {timestamp: 5, message: "line 6"},
+                                {timestamp: 7, message: "line 8"},
+                                {timestamp: 8, message: "line 9"},
+                                {timestamp: 9, message: "line 10"}
+                            ],
+                            logGroupName: "the-log-groupname",
+                            logStreamName: "the-log-stream"
+                        }, jasmine.any(Function))
+                        done()
+                    })
+            })
+
             it ("sends the correct information", done => {
                 putLogEventsWillSucceed()
 
