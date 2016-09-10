@@ -1,6 +1,9 @@
-var rfr = require("rfr");
-var inputRepository = rfr("lib/inputRepository")();
-var promise = require("the-promise-factory");
+var rfr = require("rfr")
+var promise = require("the-promise-factory")
+var inputRepository = rfr("lib/inputRepository")()
+var forwarderServiceFactory = rfr("lib/forwarderServiceFactory")()
+var forwarderConfigReader = rfr("lib/forwarderConfigReader")()
+var forwarderService = forwarderServiceFactory.create()
 
 console.log("FF_AWS_REGION", process.env.AWS_REGION)
 
@@ -24,20 +27,28 @@ initAWS()
 
 function initAWS(){
     return promise.create((fulfill, reject) => {
-        //TODO: real implementation
+        var config = forwarderConfigReader.read()
+        console.log("FF_CONFIG", config)
 
-        setTimeout(() => {
-            fulfill({
-                logParameters: {
-                    logGroupName: "logGroupName",
-                    logStreamName: "logStreamName",
-                    sequenceToken: "000001"
-                },
-                logWriter: {
-                    putLogEvents: () => {}
-                }
-            })
-        }, 1000);
+        forwarderService
+            .init(config)
+            .then(() => {
+                //TODO simply call fulfill and remove all of this
+
+                setTimeout(() => {
+                    fulfill({
+                        logParameters: {
+                            logGroupName: "logGroupName",
+                            logStreamName: "logStreamName",
+                            sequenceToken: "000001"
+                        },
+                        logWriter: {
+                            putLogEvents: () => {}
+                        }
+                    })
+                }, 1000)
+
+            }, reject)
     });
 }
 
@@ -80,9 +91,12 @@ function sendAvailableLogLines(awsInfo){
             inputRepository.setLines(lines.slice(10));
         }
 
-        //TODO: implement the real sender
-        console.log("FF: ", linesToSend.map(l => l.message.toString()).join(","));
-        var updatedAwsInfo = awsInfo;
-        fulfill(updatedAwsInfo)
+        //TODO remove the aws info
+        forwarderService
+            .send(linesToSend)
+            .then(() => {
+                var updatedAwsInfo = awsInfo;
+                fulfill(updatedAwsInfo)
+            }, reject)
     })
 }
