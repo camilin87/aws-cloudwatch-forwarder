@@ -59,13 +59,13 @@ function sendAvailableLogLines(){
 
         var linesToSend = [];
 
-        if (lines.length < 10){
+        if (lines.length < 5000){
             linesToSend = lines;
             inputRepository.setLines([]);
         }
         else {
-            linesToSend = lines.slice(0, 10);
-            inputRepository.setLines(lines.slice(10));
+            linesToSend = lines.slice(0, 5000);
+            inputRepository.setLines(lines.slice(5000));
         }
 
         forwarderService
