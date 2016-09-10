@@ -11,12 +11,18 @@ describe("forwarder", () => {
     var setTimeoutStub = null
 
     var isInputClosed = null
+    var setLinesInvocations = null
+
+    beforeAll(() => {
+        spyOn(console, "log")
+    })
 
     beforeEach(() => {
+        setLinesInvocations = []
         inputRepositoryStub = {
             isInputClosed: () => isInputClosed,
             getLines: () => {},
-            setLines: () => {}
+            setLines: lines => setLinesInvocations.push(lines)
         }
 
         forwarderServiceStub = {
@@ -54,6 +60,14 @@ describe("forwarder", () => {
         spyOn(inputRepositoryStub, "getLines").and.callFake(() => {
             return callback()
         })
+    }
+
+    function generateLines(count){
+        var result = []
+        for (var i = 0; i < count; i++){
+            result.push(`line ${i + 1}`)
+        }
+        return result
     }
 
     it ("inits the forwarder service", done => {
@@ -108,7 +122,7 @@ describe("forwarder", () => {
         })
     })
 
-    it ("tries to reads the lines after intervals until the stream gets closed", done => {
+    it ("tries to read the lines after intervals until the stream gets closed", done => {
         initWillSucceed()
         isInputClosed = false
         var getLinesCallIdx = 0
@@ -126,6 +140,28 @@ describe("forwarder", () => {
             expect(getLinesCallIdx).toBe(5)
             expect(setTimeoutStub.calls.count()).toEqual(5);
             expect(setTimeoutStub).toHaveBeenCalledWith(jasmine.any(Function), 1200)
+            done()
+        })
+    })
+
+    it ("does not wait if there are lines", done => {
+        initWillSucceed()
+        isInputClosed = false
+
+        var getLinesCallIdx = 0
+        getLinesWillReturn(() => {
+            getLinesCallIdx++
+
+            if (getLinesCallIdx === 3){
+                isInputClosed = true
+            }
+
+            return generateLines(1)
+        })
+
+        forwarder.run().then(() => {
+            expect(getLinesCallIdx).toBe(3)
+            expect(setTimeoutStub).not.toHaveBeenCalled()
             done()
         })
     })
