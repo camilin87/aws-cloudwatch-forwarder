@@ -39,4 +39,10 @@ describe("configReader", () => {
 
         expect(reader.read().retryDelayBase).toBe(1000)
     })
+
+    it ("reads the debug flag", () => {
+        envStub.FCG_DEBUG = 'true'
+
+        expect(reader.read().debug).toBe(true)
+    })
 })
