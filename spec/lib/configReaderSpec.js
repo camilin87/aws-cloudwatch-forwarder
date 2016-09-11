@@ -35,7 +35,7 @@ describe("configReader", () => {
     })
 
     it ("reads the retry delay interval base", () => {
-        envStub.FCG_RETRY_DELAY_BASE_INTERVAL = 1000
+        envStub.FCG_RETRY_DELAY_BASE_INTERVAL = '1000'
 
         expect(reader.read().retryDelayBase).toBe(1000)
     })
