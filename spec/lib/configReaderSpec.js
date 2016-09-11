@@ -15,4 +15,10 @@ describe("configReader", () => {
     it ("returns an empty object by default", () => {
         expect(reader.read()).toEqual({})
     })
+
+    it ("reads the input polling interval", () => {
+        envStub.FCG_POLLING_INTERVAL = '2000'
+
+        expect(reader.read().readInterval).toBe(2000)
+    })
 })
