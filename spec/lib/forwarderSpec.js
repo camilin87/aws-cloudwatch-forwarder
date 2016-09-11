@@ -283,4 +283,16 @@ describe("forwarder", () => {
             done()
         })
     })
+
+    it ("re-inits and re-sends multiple times when send fails", done => {
+        initWillFail("something went wrong")
+        isInputClosed = false
+        getLinesWillReturn(() => generateLines(2))
+
+        forwarder.run({maxRetries: 3}).then(null, err => {
+            expect(err).toBe("something went wrong")
+            expect(forwarderServiceStub.init.calls.count()).toBe(3)
+            done()
+        })
+    })
 })
