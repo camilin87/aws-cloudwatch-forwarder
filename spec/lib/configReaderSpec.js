@@ -21,4 +21,10 @@ describe("configReader", () => {
 
         expect(reader.read().readInterval).toBe(2000)
     })
+
+    it ("reads the max messages count", () => {
+        envStub.FCG_MAX_COUNT_PER_TRANSMISSION = '5000'
+
+        expect(reader.read().maxCount).toBe(5000)
+    })
 })
