@@ -295,4 +295,20 @@ describe("forwarder", () => {
             done()
         })
     })
+
+    it ("waits an exponential time between retries", done => {
+        initWillFail("something went wrong")
+        isInputClosed = false
+        getLinesWillReturn(() => generateLines(2))
+
+        forwarder.run({maxRetries: 5, retryDelayBase: 2}).then(null, err => {
+            expect(err).toBe("something went wrong")
+            expect(setTimeoutStub.calls.count()).toEqual(4)
+            expect(setTimeoutStub.calls.argsFor(0)).toEqual([jasmine.any(Function), 2])
+            expect(setTimeoutStub.calls.argsFor(1)).toEqual([jasmine.any(Function), 4])
+            expect(setTimeoutStub.calls.argsFor(2)).toEqual([jasmine.any(Function), 8])
+            expect(setTimeoutStub.calls.argsFor(3)).toEqual([jasmine.any(Function), 16])
+            done()
+        })
+    })
 })
