@@ -54,9 +54,21 @@ describe("forwarder", () => {
         }))
     }
 
+    function initWillFail(err){
+        spyOn(forwarderServiceStub, "init").and.callFake(() => promise.create((fulfill, reject) => {
+            reject(err)
+        }))
+    }
+
     function sendWillSucceed(){
         spyOn(forwarderServiceStub, "send").and.callFake(() => promise.create((fulfill, reject) => {
             fulfill()
+        }))
+    }
+
+    function sendWillFail(err){
+        spyOn(forwarderServiceStub, "send").and.callFake(() => promise.create((fulfill, reject) => {
+            reject(err)
         }))
     }
 
@@ -85,9 +97,7 @@ describe("forwarder", () => {
     })
 
     it ("fails when the forwarder could not be initialized", done => {
-        spyOn(forwarderServiceStub, "init").and.callFake(() => promise.create((fulfill, reject) => {
-            reject("something went wrong")
-        }))
+        initWillFail("something went wrong")
 
         forwarder.run().then(null, err => {
             expect(err).toBe("something went wrong")
@@ -200,9 +210,7 @@ describe("forwarder", () => {
         initWillSucceed()
         isInputClosed = false
         getLinesWillReturn(() => generateLines(2))
-        spyOn(forwarderServiceStub, "send").and.callFake(() => promise.create((fulfill, reject) => {
-            reject("something went wrong")
-        }))
+        sendWillFail("something went wrong")
 
         forwarder.run().then(null, err => {
             expect(err).toBe("something went wrong")
@@ -266,9 +274,7 @@ describe("forwarder", () => {
         initWillSucceed()
         isInputClosed = false
         getLinesWillReturn(() => generateLines(2))
-        spyOn(forwarderServiceStub, "send").and.callFake(() => promise.create((fulfill, reject) => {
-            reject("something went wrong")
-        }))
+        sendWillFail("something went wrong")
 
         forwarder.run({maxRetries: 3}).then(null, err => {
             expect(err).toBe("something went wrong")
