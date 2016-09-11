@@ -233,4 +233,32 @@ describe("forwarder", () => {
             done()
         })
     })
+
+    it ("groups the lines", done => {
+        initWillSucceed()
+        sendWillSucceed()
+        isInputClosed = false
+
+        var allLines = generateLines(10)
+        inputRepositoryStub.setLines = (l) => allLines = l
+
+        getLinesWillReturn(() => {
+            if (allLines.length === 0){
+                isInputClosed = true
+            }
+
+            return allLines
+        })
+
+
+        forwarder.run({maxCount: 2}).then(() => {
+            expect(forwarderServiceStub.send.calls.count()).toEqual(5);
+            expect(forwarderServiceStub.send.calls.argsFor(0)).toEqual([["line 1", "line 2"]]);
+            expect(forwarderServiceStub.send.calls.argsFor(1)).toEqual([["line 3", "line 4"]]);
+            expect(forwarderServiceStub.send.calls.argsFor(2)).toEqual([["line 5", "line 6"]]);
+            expect(forwarderServiceStub.send.calls.argsFor(3)).toEqual([["line 7", "line 8"]]);
+            expect(forwarderServiceStub.send.calls.argsFor(4)).toEqual([["line 9", "line 10"]]);
+            done()
+        })
+    })
 })
