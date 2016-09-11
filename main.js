@@ -1,12 +1,14 @@
 var rfr = require("rfr")
+var configReader = rfr("lib/configReader")()
 var forwarder = rfr("lib/forwarder")(
     rfr("lib/inputRepository")(),
     rfr("lib/forwarderServiceFactory")(),
     rfr("lib/forwarderConfigReader")()
 )
 
+var config = configReader.read()
 forwarder
-    .run()
+    .run(config)
     .then(() => {
         console.log("FF_COMPLETED");
         process.exit(0);
