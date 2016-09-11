@@ -261,4 +261,20 @@ describe("forwarder", () => {
             done()
         })
     })
+
+    it ("re-inits and re-sends multiple times when send fails", done => {
+        initWillSucceed()
+        isInputClosed = false
+        getLinesWillReturn(() => generateLines(2))
+        spyOn(forwarderServiceStub, "send").and.callFake(() => promise.create((fulfill, reject) => {
+            reject("something went wrong")
+        }))
+
+        forwarder.run({maxRetries: 3}).then(null, err => {
+            expect(err).toBe("something went wrong")
+            expect(forwarderServiceStub.init.calls.count()).toBe(3)
+            expect(forwarderServiceStub.send.calls.count()).toBe(3)
+            done()
+        })
+    })
 })
