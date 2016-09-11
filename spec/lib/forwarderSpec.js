@@ -196,7 +196,7 @@ describe("forwarder", () => {
         })
     })
 
-    it ("sends the available lines", done => {
+    it ("fails when lines could not be sent", done => {
         initWillSucceed()
         isInputClosed = false
         getLinesWillReturn(() => generateLines(2))
@@ -206,6 +206,30 @@ describe("forwarder", () => {
 
         forwarder.run().then(null, err => {
             expect(err).toBe("something went wrong")
+            done()
+        })
+    })
+
+    it ("clears the lines before sending them", done => {
+        initWillSucceed()
+        sendWillSucceed()
+        isInputClosed = false
+
+        var getLinesCallIdx = 0
+        getLinesWillReturn(() => {
+            getLinesCallIdx++
+
+            if (getLinesCallIdx === 3){
+                isInputClosed = true
+            }
+
+            return generateLines(2)
+        })
+
+        forwarder.run().then(() => {
+            expect(setLinesInvocations).toEqual([
+                [], [], []
+            ])
             done()
         })
     })
