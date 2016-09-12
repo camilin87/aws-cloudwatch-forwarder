@@ -13,6 +13,8 @@ describe("forwarder", () => {
     var isInputClosed = null
     var setLinesInvocations = null
 
+    beforeAll(() => spyOn(console, "log"))
+
     beforeEach(() => {
         setLinesInvocations = []
         inputRepositoryStub = {
