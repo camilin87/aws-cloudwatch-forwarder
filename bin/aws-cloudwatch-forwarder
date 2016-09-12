@@ -1,3 +1,7 @@
+#!/usr/bin/env node
+
+'use strict'
+
 var rfr = require("rfr")
 var configReader = rfr("lib/configReader")()
 var forwarder = rfr("lib/forwarder")(
