@@ -300,6 +300,32 @@ describe("awsForwarderService", function() {
                     })
             })
 
+            it ("escapes terminal colors", done => {
+                putLogEventsWillSucceed()
+                var seededLines = generateMessages(2)
+
+                var excludedSequences = Array
+                    .from(new Array(20), (x,i) => i + 30)
+                    .map(x => `[${x}m`)
+                    .join("")
+                seededLines[0].message += excludedSequences
+                seededLines[1].message = "[36" + seededLines[1].message
+
+                service
+                    .send(seededLines)
+                    .then(() => {
+                        expect(cloudwatchLogsStub.putLogEvents).toHaveBeenCalledWith({
+                            logEvents: [
+                                {timestamp: 0, message: "line 1"},
+                                {timestamp: 1, message: "[36line 2"}
+                            ],
+                            logGroupName: "the-log-groupname",
+                            logStreamName: "the-log-stream"
+                        }, jasmine.any(Function))
+                        done()
+                    })
+            })
+
             it ("fails when log transmission failed", done => {
                 spyOn(cloudwatchLogsStub, "putLogEvents").and.callFake((info, callback) => {
                     callback("something went wrong");
