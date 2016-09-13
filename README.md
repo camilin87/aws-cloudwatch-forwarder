@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/camilin87/aws-cloudwatch-forwarder.svg?branch=master)](https://travis-ci.org/camilin87/aws-cloudwatch-forwarder)  
 
-Forwards the StdIn to AWS Cloudwatch  
+Forwards any process StdOut and StdErr to AWS Cloudwatch. Automatically configures the log group and log stream. Uploads the log events in batches. Retries in the case of errors.  
 
 ## Prerequisites  
 1. [NodeJs](https://nodejs.org/en/download/package-manager/)  
@@ -24,13 +24,11 @@ npm i -g aws-cloudwatch-forwarder
 
 ## Usage  
 
-Execute your application in the following way  
-
 ```sh
 aws-cloudwatch-forwarder 'echo "sample application"'
 ```
 
-Where `echo "sample application"` is your application.  
+Where `echo "sample application"` is your application. **DO NOT** forget to wrap your application in quotes.  
 
 ### Usage inside of a node application  
 
