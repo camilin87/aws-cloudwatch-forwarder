@@ -3,7 +3,7 @@
 // console.log("argv", process.argv)
 
 var targetApplication = process.argv.slice(2).join(" ")
-var targetProcess = `set -o pipefail; (${targetApplication}) 2>&1 | aws-cloudwatch-forwarder`
+var targetProcess = `set -o pipefail; (${targetApplication}) 2>&1 | aws-cloudwatch-forwarder-proc`
 
 // console.log("targetApplication", targetApplication)
 // console.log("targetProcess", targetProcess)
