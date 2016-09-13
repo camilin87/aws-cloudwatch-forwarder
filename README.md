@@ -61,4 +61,6 @@ The forwarder can be configured through the following environment variables.
 
 - `FCG_RETRY_DELAY_BASE_INTERVAL` the base number of milliseconds to use in the exponential backoff for operation retries. Defaults to `100` ms.  
 
-- `FCG_DEBUG` whether to display forwarder events. Defaults to `false`  
+- `FCG_DEBUG` whether to display forwarder events. Defaults to `false`.  
+
+- `FCG_START_DEBUGGER` whether to launch the forwarder using the [node-inspector](https://github.com/node-inspector/node-inspector) debugger. Defaults to `false`.  
