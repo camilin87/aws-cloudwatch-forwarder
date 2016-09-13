@@ -27,18 +27,10 @@ npm i -g aws-cloudwatch-forwarder
 Execute your application in the following way  
 
 ```sh
-set -o pipefail; (echo "sample application") 2>&1 | aws-cloudwatch-forwarder
+aws-cloudwatch-forwarder 'echo "sample application"'
 ```
 
 Where `echo "sample application"` is your application.  
-
-### Why so complicated?  
-
-- `set -o pipefail;` configures the pipeline to fail if any of the piped commands fails [Source](http://www.gnu.org/software/bash/manual/html_node/Pipelines.html)  
-
-- [`2>&1` meaning](http://unix.stackexchange.com/questions/99263/what-does-21-in-this-command-mean)  
-
-- `| aws-cloudwatch-forwarder` pipes any output from your application into the forwarder  
 
 ### Usage inside of a node application  
 
