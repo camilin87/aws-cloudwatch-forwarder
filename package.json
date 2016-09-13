@@ -1,6 +1,6 @@
 {
   "name": "aws-cloudwatch-forwarder",
-  "version": "0.0.1-beta4",
+  "version": "0.0.1-beta5",
   "description": "Forwards the Stdin to AWS Cloudwatch",
   "bin": {
     "aws-cloudwatch-forwarder": "./bin/aws-cloudwatch-forwarder"
