@@ -4,21 +4,25 @@
 
 var rfr = require("rfr")
 var async = require("async")
-var childProcess = require('child_process')
+var forwarder = rfr("lib/forwarder")
+var forwarderServiceFactory = rfr("lib/forwarderServiceFactory")()
+var forwarderConfigReader = rfr("lib/forwarderConfigReader")()
 var configReader = rfr("lib/configReader")()
-var forwarder = rfr("lib/forwarder")(
-    rfr("lib/inputRepository")(),
-    rfr("lib/forwarderServiceFactory")(),
-    rfr("lib/forwarderConfigReader")()
-)
+var childProcess = require("child_process")
 var applicationExecutor = rfr("lib/applicationExecutor")(childProcess)
+
 
 var config = configReader.read()
 var targetApplication = process.argv.slice(2).join(" ")
 
+var child = applicationExecutor.run(targetApplication)
+var inputRepository = rfr("lib/inputRepository")(child.getOutputStream())
+
+
+
 async.parallel([
     (callback) => {
-        forwarder
+        forwarder(inputRepository, forwarderServiceFactory, forwarderConfigReader)
             .run(config)
             .then(
                 () => callback(null, 0),
@@ -26,13 +30,9 @@ async.parallel([
             )
     },
     (callback) => {
-        applicationExecutor
-            .run(targetApplication)
-            .then(
-                code => callback(null, code),
-                err => callback(null, 1)
-            )
+        child.wait().then(
+            code => callback(null, code),
+            err => callback(null, 1)
+        )
     }
-], (err, exitCode) => {
-    process.exit(exitCode)
-})
+], (err, exitCode) => process.exit(exitCode))
