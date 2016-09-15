@@ -1,10 +1,9 @@
 {
   "name": "aws-cloudwatch-forwarder",
-  "version": "1.0.0",
+  "version": "1.0.1-beta2",
   "description": "Forwards the Stdin to AWS Cloudwatch",
   "bin": {
-    "aws-cloudwatch-forwarder": "./bin/aws-cloudwatch-forwarder-wrapper",
-    "aws-cloudwatch-forwarder-proc": "./bin/aws-cloudwatch-forwarder-proc"
+    "aws-cloudwatch-forwarder": "./bin/aws-cloudwatch-forwarder-proc"
   },
   "scripts": {
     "prestart": "npm i",
@@ -31,7 +30,6 @@
     "rfr"
   ],
   "devDependencies": {
-    "jasmine": "^2.4.1",
-    "node-inspector": "^0.12.8"
+    "jasmine": "^2.4.1"
   }
 }
