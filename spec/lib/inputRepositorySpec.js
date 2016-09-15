@@ -36,7 +36,7 @@ describe("inputRepository", () => {
             return invocationCount;
         }
 
-        repository = inputRepository(readlineMock, processMock, currentTime);
+        repository = inputRepository(null, readlineMock, processMock, currentTime);
     })
 
     function sendLine(line) {
