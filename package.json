@@ -24,6 +24,7 @@
     "async": "^2.0.1",
     "aws-sdk": "^2.5.5",
     "rfr": "^1.2.3",
+    "split": "^1.0.0",
     "the-promise-factory": "^1.0.0"
   },
   "bundledDependencies": [
