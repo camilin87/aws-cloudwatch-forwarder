@@ -16,7 +16,7 @@ var config = configReader.read()
 var targetApplication = process.argv.slice(2).join(" ")
 
 var child = applicationExecutor.run(targetApplication)
-var inputRepository = rfr("lib/inputRepository")(child.getOutputStream())
+var inputRepository = rfr("lib/inputRepository")(child.getStatus())
 
 
 
