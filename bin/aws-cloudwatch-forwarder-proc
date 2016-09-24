@@ -19,7 +19,6 @@ var child = applicationExecutor.run(targetApplication)
 var inputRepository = rfr("lib/inputRepository")(child.getStatus())
 
 
-
 async.parallel([
     (callback) => {
         forwarder(inputRepository, forwarderServiceFactory, forwarderConfigReader)
