@@ -49,8 +49,7 @@ describe("inputRepository", () => {
 
     it ("initializes the readline module with the correct parameters", () => {
         expect(createdInterface).toEqual({
-            input: "the std in",
-            output: "the std out",
+            input: "the std out",
             terminal: false
         })
     })
