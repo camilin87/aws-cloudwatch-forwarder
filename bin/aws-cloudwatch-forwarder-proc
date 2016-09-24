@@ -15,7 +15,7 @@ var applicationExecutor = rfr("lib/applicationExecutor")(childProcess)
 var config = configReader.read()
 var targetApplication = process.argv.slice(2).join(" ")
 
-var child = applicationExecutor.run(targetApplication)
+var child = applicationExecutor.config(targetApplication)
 var inputRepository = rfr("lib/inputRepository")(child.getStatus())
 
 
@@ -29,7 +29,7 @@ async.parallel([
             )
     },
     (callback) => {
-        child.wait().then(
+        child.run().then(
             code => callback(null, code),
             err => callback(null, 1)
         )
