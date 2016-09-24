@@ -11,6 +11,7 @@ describe("inputRepository", () => {
     var createdInterface = null
     var rlStub = null
     var rlCallbacks = null
+    var childProcessStatus = null
 
     var repository = null
 
@@ -36,7 +37,9 @@ describe("inputRepository", () => {
             return invocationCount
         }
 
-        repository = inputRepository(null, readlineMock, processMock, currentTime)
+        childProcessStatus = {}
+
+        repository = inputRepository(childProcessStatus, readlineMock, processMock, currentTime)
     })
 
     function sendLine(line) {
@@ -60,6 +63,23 @@ describe("inputRepository", () => {
 
     it ("isInputClosed is true when there are no lines and the stream was closed", () => {
         closeInputStream()
+
+        expect(repository.isInputClosed()).toBe(true)
+    })
+
+    it ("isInputClosed is false when the stream is closed but there are lines", () => {
+        repository.setLines([
+            "line 1",
+            "line 2",
+            "line 3",
+        ])
+        closeInputStream()
+
+        expect(repository.isInputClosed()).toBe(false)
+    })
+
+    it ("isInputClosed is true when there are no lines and the child process is closed", () => {
+        childProcessStatus.closed = true
 
         expect(repository.isInputClosed()).toBe(true)
     })
@@ -98,16 +118,5 @@ describe("inputRepository", () => {
         repository.setLines(null)
 
         expect(repository.getLines()).toEqual([])
-    })
-
-    it ("isInputClosed is false when the stream is closed but there are lines", () => {
-        repository.setLines([
-            "line 1",
-            "line 2",
-            "line 3",
-        ])
-        closeInputStream()
-
-        expect(repository.isInputClosed()).toBe(false)
     })
 })
