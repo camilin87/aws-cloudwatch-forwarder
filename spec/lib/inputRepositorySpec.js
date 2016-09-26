@@ -39,7 +39,7 @@ describe("inputRepository", () => {
 
         childProcessStatus = {}
 
-        repository = inputRepository(childProcessStatus, readlineMock, processMock, currentTime)
+        repository = inputRepository(childProcessStatus, null, processMock, currentTime)
     })
 
     function sendLine(line) {
