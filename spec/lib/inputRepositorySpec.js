@@ -2,16 +2,14 @@ var rfr = require("rfr")
 var inputRepository = rfr("lib/inputRepository")
 
 describe("inputRepository", () => {
-    var processMock = {
-        stdin: "the std in",
-        stdout: "the std out"
-    }
-
     var readlineMock = null
     var createdInterface = null
     var rlStub = null
     var rlCallbacks = null
     var childProcessStatus = null
+
+    var childStdOutStub = "the child stdout"
+    var childStdErrStub = "the child stderr"
 
     var repository = null
 
@@ -37,9 +35,12 @@ describe("inputRepository", () => {
             return invocationCount
         }
 
-        childProcessStatus = {}
+        childProcessStatus = {
+            stdout: childStdOutStub,
+            stderr: childStdErrStub
+        }
 
-        repository = inputRepository(childProcessStatus, null, processMock, currentTime)
+        repository = inputRepository(childProcessStatus, null, currentTime)
     })
 
     function sendLine(line) {
@@ -49,13 +50,6 @@ describe("inputRepository", () => {
     function closeInputStream() {
         rlCallbacks["close"]()
     }
-
-    it ("initializes the readline module with the correct parameters", () => {
-        expect(createdInterface).toEqual({
-            input: "the std out",
-            terminal: false
-        })
-    })
 
     it ("isInputClosed is false by default", () => {
         expect(repository.isInputClosed()).toBe(false)
