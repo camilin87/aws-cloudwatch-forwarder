@@ -34,4 +34,7 @@ async.parallel([
             err => callback(null, 1)
         )
     }
-], (err, exitCode) => process.exit(exitCode))
+], (err, exitCodes) => {
+    var exitCode = Math.max.apply(Math, exitCodes)
+    process.exit(exitCode)
+})
