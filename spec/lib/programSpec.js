@@ -9,14 +9,12 @@ describe("program", () => {
     var seededProgramInfoConfig = {
         name: "the seeded config"
     }
-    var forwarderConfig = null
 
     var seededForwarder = null
     var seededChildProcess = null
 
     beforeEach(() => {
         exitCode = -1
-        forwarderConfig = null
 
         seededForwarder = {
             run: () => {}
@@ -59,7 +57,6 @@ describe("program", () => {
         }
 
         spyOn(seededForwarder, "run").and.callFake(config => promise.create((fulfill, reject) => {
-            forwarderConfig = config
             reject(seededError)
         }))
     }
@@ -72,16 +69,27 @@ describe("program", () => {
 
     function forwarderWillSucceed(){
         spyOn(seededForwarder, "run").and.callFake(config => promise.create((fulfill, reject) => {
-            forwarderConfig = config
             fulfill()
         }))
     }
 
     it ("bubbles up child process failures", done => {
         childProcessWillFail()
+        forwarderWillSucceed()
 
         program.run().then(() => {
             expect(seededChildProcess.wait).toHaveBeenCalled()
+            expect(exitCode).toBe(1)
+            done()
+        })
+    })
+
+    it ("bubbles up forwarder failures", done => {
+        childProcessWillSucceed()
+        forwarderWillFail()
+
+        program.run().then(() => {
+            expect(seededForwarder.run).toHaveBeenCalledWith(seededProgramInfoConfig)
             expect(exitCode).toBe(1)
             done()
         })
