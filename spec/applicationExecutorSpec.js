@@ -20,6 +20,6 @@ describe("applicationExecutor", ()  =>{
 
         executor.run("npm run test --format=json")
 
-        expect(childProcessStub.spawn).toHaveBeenCalled()
+        expect(childProcessStub.spawn).toHaveBeenCalledWith("npm", ["run test --format=json"], {stdio: "pipe"})
     })
 })
