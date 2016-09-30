@@ -108,4 +108,14 @@ describe("program", () => {
             done()
         })
     })
+
+    it ("successfully finishes when everything is fine", done => {
+        forwarderWillSucceed()
+        childProcessWillSucceed()
+
+        program.run().then(() => {
+            expect(exitCode).toBe(0)
+            done()
+        })
+    })
 })
