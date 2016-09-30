@@ -41,15 +41,29 @@ describe("program", () => {
         program = programModule(processStub, programInitializerStub)
     })
 
-    it ("bubbles up child process failures", done => {
+    function childProcessWillFail(seededError) {
+        if (!seededError){
+            seededError = "unexpected error"
+        }
+
         spyOn(seededChildProcess, "wait").and.callFake(() => promise.create((fulfill, reject) => {
-            reject("unexpected error")
+            reject(seededError)
         }))
+    }
+
+    function childProcessWillSuceed(){
+        spyOn(seededChildProcess, "wait").and.callFake(() => promise.create((fulfill, reject) => {
+            fulfill()
+        }))
+    }
+
+    it ("bubbles up child process failures", done => {
+        childProcessWillFail()
 
         program.run().then(() => {
             expect(seededChildProcess.wait).toHaveBeenCalled()
             expect(exitCode).toBe(1)
             done()
-        }) 
+        })
     })
 })
