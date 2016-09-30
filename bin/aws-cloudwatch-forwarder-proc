@@ -4,24 +4,22 @@
 
 var rfr = require("rfr")
 var async = require("async")
-var forwarder = rfr("lib/forwarder")
-var forwarderServiceFactory = rfr("lib/forwarderServiceFactory")()
-var forwarderConfigReader = rfr("lib/forwarderConfigReader")()
 var configReader = rfr("lib/configReader")()
 var childProcess = require("child_process")
 var applicationExecutor = rfr("lib/applicationExecutor")(childProcess)
 var inputRepositoryFactory = rfr("lib/inputRepositoryFactory")()
+var forwarderFactory = rfr("lib/forwarderFactory")()
 
 var config = configReader.read()
 var targetApplication = process.argv.slice(2).join(" ")
 
 var child = applicationExecutor.run(targetApplication)
 var inputRepository = inputRepositoryFactory.create(child.getStatus())
-
+var forwarder = forwarderFactory.create(inputRepository)
 
 async.parallel([
     (callback) => {
-        forwarder(inputRepository, forwarderServiceFactory, forwarderConfigReader)
+        forwarder
             .run(config)
             .then(
                 () => callback(null, 0),
