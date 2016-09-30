@@ -10,13 +10,13 @@ var forwarderConfigReader = rfr("lib/forwarderConfigReader")()
 var configReader = rfr("lib/configReader")()
 var childProcess = require("child_process")
 var applicationExecutor = rfr("lib/applicationExecutor")(childProcess)
-
+var inputRepositoryFactory = rfr("lib/inputRepositoryFactory")()
 
 var config = configReader.read()
 var targetApplication = process.argv.slice(2).join(" ")
 
 var child = applicationExecutor.run(targetApplication)
-var inputRepository = rfr("lib/inputRepository")(child.getStatus())
+var inputRepository = inputRepositoryFactory.create(child.getStatus())
 
 
 async.parallel([
