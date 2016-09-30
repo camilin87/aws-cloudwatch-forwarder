@@ -7,6 +7,7 @@ describe("programInitializer", () => {
     var processStub = null
     var applicationExecutorStub = null
     var configReaderStub = null
+    var inputRepositoryFactoryStub = null
 
     beforeEach(() => {
         processStub = {
@@ -21,17 +22,31 @@ describe("programInitializer", () => {
             read: () => {}
         }
 
+        inputRepositoryFactoryStub = {
+            create: () => {}
+        }
+
         initializer = programInitializer(
             processStub,
             configReaderStub,
             applicationExecutorStub,
-            null,
+            inputRepositoryFactoryStub,
             null
         )
     })
 
+    function setupApplicationExecutorResult(seededChildProcess) {
+        if (!seededChildProcess){
+            seededChildProcess = {
+                getStatus: () => null
+            }
+        }
+
+        spyOn(applicationExecutorStub, "run").and.returnValue(seededChildProcess)
+    }
+
     it ("runs the target application", () => {
-        spyOn(applicationExecutorStub, "run")
+        setupApplicationExecutorResult()
         processStub.argv = [
             "node", "aws-forwarder",
             "npm", "run", "test", "--format=json"
@@ -47,7 +62,7 @@ describe("programInitializer", () => {
             name: "child process",
             getStatus: () => {}
         }
-        spyOn(applicationExecutorStub, "run").and.returnValue(seededChildProcess)
+        setupApplicationExecutorResult(seededChildProcess)
         processStub.argv = [
             "node", "aws-forwarder",
             "npm", "start"
@@ -61,7 +76,19 @@ describe("programInitializer", () => {
             name: "seeded configuration"
         }
         spyOn(configReaderStub, "read").and.returnValue(seededConfig)
+        setupApplicationExecutorResult()
 
         expect(initializer.init().config).toBe(seededConfig)
+    })
+
+    it ("creates an inputRepository", () => {
+        setupApplicationExecutorResult({
+            getStatus: () => "child status"
+        })
+        spyOn(inputRepositoryFactoryStub, "create")
+
+        initializer.init()
+
+        expect(inputRepositoryFactoryStub.create).toHaveBeenCalledWith("child status")
     })
 })
