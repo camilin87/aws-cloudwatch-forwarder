@@ -61,9 +61,13 @@ describe("program", () => {
         }))
     }
 
-    function childProcessWillSucceed(){
+    function childProcessWillSucceed(code){
+        if(!code){
+            code = 0
+        }
+
         spyOn(seededChildProcess, "wait").and.callFake(() => promise.create((fulfill, reject) => {
-            fulfill()
+            fulfill(code)
         }))
     }
 
@@ -91,6 +95,16 @@ describe("program", () => {
         program.run().then(() => {
             expect(seededForwarder.run).toHaveBeenCalledWith(seededProgramInfoConfig)
             expect(exitCode).toBe(1)
+            done()
+        })
+    })
+
+    it ("fails when the child process didn't finished with a zero exit code", done => {
+        forwarderWillSucceed()
+        childProcessWillSucceed(10)
+
+        program.run().then(() => {
+            expect(exitCode).toBe(10)
             done()
         })
     })
