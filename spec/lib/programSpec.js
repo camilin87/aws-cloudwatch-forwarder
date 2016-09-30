@@ -5,7 +5,6 @@ var programModule = rfr("lib/program")
 describe("program", () => {
     var program = null
 
-    var exitCode = -1
     var seededProgramInfoConfig = {
         name: "the seeded config"
     }
@@ -14,8 +13,6 @@ describe("program", () => {
     var seededChildProcess = null
 
     beforeEach(() => {
-        exitCode = -1
-
         seededForwarder = {
             run: () => {}
         }
@@ -34,11 +31,7 @@ describe("program", () => {
             }
         }
 
-        var processStub = {
-            exit: value => { exitCode = value }
-        }
-
-        program = programModule(processStub, programInitializerStub)
+        program = programModule(programInitializerStub)
     })
 
     function childProcessWillFail(seededError) {
@@ -81,7 +74,7 @@ describe("program", () => {
         childProcessWillFail()
         forwarderWillSucceed()
 
-        program.run().then(() => {
+        program.run().then(exitCode => {
             expect(seededChildProcess.wait).toHaveBeenCalled()
             expect(exitCode).toBe(1)
             done()
@@ -92,7 +85,7 @@ describe("program", () => {
         childProcessWillSucceed()
         forwarderWillFail()
 
-        program.run().then(() => {
+        program.run().then(exitCode => {
             expect(seededForwarder.run).toHaveBeenCalledWith(seededProgramInfoConfig)
             expect(exitCode).toBe(1)
             done()
@@ -103,7 +96,7 @@ describe("program", () => {
         forwarderWillSucceed()
         childProcessWillSucceed(10)
 
-        program.run().then(() => {
+        program.run().then(exitCode => {
             expect(exitCode).toBe(10)
             done()
         })
@@ -113,7 +106,7 @@ describe("program", () => {
         forwarderWillSucceed()
         childProcessWillSucceed()
 
-        program.run().then(() => {
+        program.run().then(exitCode => {
             expect(exitCode).toBe(0)
             done()
         })
