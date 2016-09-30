@@ -6,6 +6,7 @@ describe("programInitializer", () => {
 
     var processStub = null
     var applicationExecutorStub = null
+    var configReaderStub = null
 
     beforeEach(() => {
         processStub = {
@@ -16,9 +17,13 @@ describe("programInitializer", () => {
             run: () => {}
         }
 
+        configReaderStub = {
+            read: () => {}
+        }
+
         initializer = programInitializer(
             processStub,
-            null,
+            configReaderStub,
             applicationExecutorStub,
             null,
             null
@@ -49,5 +54,14 @@ describe("programInitializer", () => {
         ]
 
         expect(initializer.init().child).toBe(seededChildProcess)
+    })
+
+    it ("returns the configuration", () => {
+        var seededConfig = {
+            name: "seeded configuration"
+        }
+        spyOn(configReaderStub, "read").and.returnValue(seededConfig)
+
+        expect(initializer.init().config).toBe(seededConfig)
     })
 })
