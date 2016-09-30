@@ -58,6 +58,14 @@ describe("programInitializer", () => {
         spyOn(inputRepositoryFactoryStub, "create").and.returnValue(seededInputRepository)
     }
 
+    function setupForwarderFactoryResult(seededForwarder){
+        if (!seededForwarder){
+            seededForwarder = {}
+        }
+
+        spyOn(forwarderFactoryStub, "create").and.returnValue(seededForwarder)
+    }
+
     it ("runs the target application", () => {
         setupApplicationExecutorResult()
         processStub.argv = [
@@ -108,10 +116,18 @@ describe("programInitializer", () => {
     it ("creates the forwarder", () => {
         setupApplicationExecutorResult()
         setupInputRepositoryFactoryResult("the input repository")
-        spyOn(forwarderFactoryStub, "create")
+        setupForwarderFactoryResult()
 
         initializer.init()
 
         expect(forwarderFactoryStub.create).toHaveBeenCalledWith("the input repository")
+    })
+
+    it ("returns the forwarder", () => {
+        setupApplicationExecutorResult()
+        setupInputRepositoryFactoryResult()
+        setupForwarderFactoryResult("the forwarder")
+
+        expect(initializer.init().forwarder).toBe("the forwarder")
     })
 })
