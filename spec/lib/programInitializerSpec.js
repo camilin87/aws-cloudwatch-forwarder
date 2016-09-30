@@ -8,6 +8,7 @@ describe("programInitializer", () => {
     var applicationExecutorStub = null
     var configReaderStub = null
     var inputRepositoryFactoryStub = null
+    var forwarderFactoryStub = null
 
     beforeEach(() => {
         processStub = {
@@ -26,12 +27,16 @@ describe("programInitializer", () => {
             create: () => {}
         }
 
+        forwarderFactoryStub = {
+            create: () => {}
+        }
+
         initializer = programInitializer(
             processStub,
             configReaderStub,
             applicationExecutorStub,
             inputRepositoryFactoryStub,
-            null
+            forwarderFactoryStub
         )
     })
 
@@ -43,6 +48,14 @@ describe("programInitializer", () => {
         }
 
         spyOn(applicationExecutorStub, "run").and.returnValue(seededChildProcess)
+    }
+
+    function setupInputRepositoryFactoryResult(seededInputRepository){
+        if (!seededInputRepository){
+            seededInputRepository = {}
+        }
+
+        spyOn(inputRepositoryFactoryStub, "create").and.returnValue(seededInputRepository)
     }
 
     it ("runs the target application", () => {
@@ -85,10 +98,20 @@ describe("programInitializer", () => {
         setupApplicationExecutorResult({
             getStatus: () => "child status"
         })
-        spyOn(inputRepositoryFactoryStub, "create")
+        setupInputRepositoryFactoryResult()
 
         initializer.init()
 
         expect(inputRepositoryFactoryStub.create).toHaveBeenCalledWith("child status")
+    })
+
+    it ("creates the forwarder", () => {
+        setupApplicationExecutorResult()
+        setupInputRepositoryFactoryResult("the input repository")
+        spyOn(forwarderFactoryStub, "create")
+
+        initializer.init()
+
+        expect(forwarderFactoryStub.create).toHaveBeenCalledWith("the input repository")
     })
 })
