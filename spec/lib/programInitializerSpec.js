@@ -36,4 +36,18 @@ describe("programInitializer", () => {
 
         expect(applicationExecutorStub.run).toHaveBeenCalledWith("npm run test --format=json")
     })
+
+    it ("returns the child process of the target application", () => {
+        var seededChildProcess = {
+            name: "child process",
+            getStatus: () => {}
+        }
+        spyOn(applicationExecutorStub, "run").and.returnValue(seededChildProcess)
+        processStub.argv = [
+            "node", "aws-forwarder",
+            "npm", "start"
+        ]
+
+        expect(initializer.init().child).toBe(seededChildProcess)
+    })
 })
