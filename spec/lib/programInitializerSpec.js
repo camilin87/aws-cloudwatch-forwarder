@@ -28,12 +28,8 @@ describe("programInitializer", () => {
     it ("runs the target application", () => {
         spyOn(applicationExecutorStub, "run")
         processStub.argv = [
-            "node",
-            "aws-forwarder",
-            "npm",
-            "run",
-            "test",
-            "--format=json"
+            "node", "aws-forwarder",
+            "npm", "run", "test", "--format=json"
         ]
 
         initializer.init()
